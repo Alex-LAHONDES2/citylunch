@@ -50,6 +50,15 @@
             "./bin/phpunit"
         ]
     },
+    "snc/redis-bundle": {
+        "version": "4.11",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "2.0",
+            "ref": "36b3d9ab65be62de4e085a25e6ca899efa96b1f3"
+        }
+    },
     "symfony/asset-mapper": {
         "version": "7.4",
         "recipe": {
