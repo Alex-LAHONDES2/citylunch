@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\CartItem;
+use App\Entity\BagItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<CartItem>
+ * @extends ServiceEntityRepository<BagItem>
  */
-class CartItemRepository extends ServiceEntityRepository
+class BagItemRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, CartItem::class);
+        parent::__construct($registry, BagItem::class);
     }
 
     //    /**
-    //     * @return CartItem[] Returns an array of CartItem objects
+    //     * @return BagItem[] Returns an array of BagItem objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class CartItemRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?CartItem
+    //    public function findOneBySomeField($value): ?BagItem
     //    {
     //        return $this->createQueryBuilder('c')
     //            ->andWhere('c.exampleField = :val')

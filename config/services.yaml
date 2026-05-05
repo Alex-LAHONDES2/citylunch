@@ -31,3 +31,7 @@ services:
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments:
             - '@Redis'
+
+    App\Security\JwtTokenManager:
+        arguments:
+            $secret: '%kernel.secret%'

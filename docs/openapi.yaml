@@ -1,0 +1,290 @@
+openapi: 3.0.3
+info:
+  title: CityLunch API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    Product:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        price: { type: number, format: float }
+        image: { type: string, nullable: true }
+      required: [id, name, price]
+    ProductCreate:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string, nullable: true }
+        price: { type: number, format: float }
+        image: { type: string, nullable: true }
+      required: [name, price]
+    Deliverer:
+      type: object
+      properties:
+        id: { type: integer }
+        email: { type: string, format: email }
+        roles:
+          type: array
+          items: { type: string }
+      required: [id, email, roles]
+    DelivererCreate:
+      type: object
+      properties:
+        email: { type: string, format: email }
+      required: [email]
+    LoginRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+      required: [email, password]
+    LoginResponse:
+      type: object
+      properties:
+        token: { type: string }
+        token_type: { type: string, example: Bearer }
+        expires_in: { type: integer, example: 3600 }
+      required: [token, token_type, expires_in]
+    BagItem:
+      type: object
+      properties:
+        product:
+          type: object
+          properties:
+            id: { type: integer }
+            name: { type: string }
+            price: { type: number, format: float }
+          required: [id, name, price]
+        quantity: { type: integer, minimum: 1 }
+      required: [product, quantity]
+    Bag:
+      type: object
+      properties:
+        id: { type: integer }
+        deliverer_id: { type: integer }
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BagItem'
+      required: [id, deliverer_id, items]
+    BagAddItemRequest:
+      type: object
+      properties:
+        productId: { type: integer }
+        quantity: { type: integer, minimum: 1, default: 1 }
+      required: [productId]
+
+paths:
+  /api/products:
+    get:
+      summary: Lister les produits
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Product' }
+    post:
+      summary: Créer un produit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductCreate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Product' }
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/products/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: integer }
+    get:
+      summary: Consulter un produit
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+    put:
+      summary: Modifier un produit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductCreate' }
+      responses:
+        '200': { description: OK }
+        '400': { description: Bad Request }
+        '404': { description: Not Found }
+    delete:
+      summary: Supprimer un produit
+      responses:
+        '204': { description: No Content }
+        '404': { description: Not Found }
+
+  /api/deliverers:
+    get:
+      summary: Lister les livreurs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Deliverer' }
+    post:
+      summary: Créer un livreur (génère un mot de passe)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DelivererCreate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Deliverer' }
+                  generated_password: { type: string }
+
+  /api/deliverers/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: integer }
+    get:
+      summary: Consulter un livreur
+      responses:
+        '200': { description: OK }
+        '404': { description: Not Found }
+    put:
+      summary: Modifier un livreur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DelivererCreate' }
+      responses:
+        '200': { description: OK }
+        '400': { description: Bad Request }
+        '404': { description: Not Found }
+    delete:
+      summary: Supprimer un livreur
+      responses:
+        '204': { description: No Content }
+        '404': { description: Not Found }
+
+  /api/login:
+    post:
+      summary: Login livreur (JWT)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '401': { description: Unauthorized }
+        '403': { description: Forbidden }
+
+  /api/bag:
+    get:
+      summary: Consulter le sac du livreur connecté
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Bag' }
+        '401': { description: Unauthorized }
+
+  /api/bag/items:
+    post:
+      summary: Ajouter un produit au sac
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BagAddItemRequest' }
+      responses:
+        '200': { description: OK }
+        '400': { description: Bad Request }
+        '401': { description: Unauthorized }
+        '404': { description: Not Found }
+
+  /api/bag/items/{productId}:
+    parameters:
+      - in: path
+        name: productId
+        required: true
+        schema: { type: integer }
+      - in: query
+        name: quantity
+        required: false
+        schema: { type: integer, minimum: 1 }
+        description: "Si absent: supprime la ligne complète"
+    delete:
+      summary: Retirer un produit du sac
+      security:
+        - bearerAuth: []
+      responses:
+        '200': { description: OK }
+        '400': { description: Bad Request }
+        '401': { description: Unauthorized }
+        '404': { description: Not Found }
+

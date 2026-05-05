@@ -3,7 +3,7 @@
 Application web développée avec Symfony permettant à des clients de consulter des plats, gérer un panier et simuler des commandes.  
 Le projet inclut également une gestion des livreurs, du stock et du suivi des livraisons.
 
-Lien vers le repo https://github.com/Alex-LAHONDES2/citylunch
+Lien vers le repo https://github.com/Alex-LAHONDES2/citylunch/tree/ec-04
 
 ---
 
@@ -34,7 +34,7 @@ Lien vers le repo https://github.com/Alex-LAHONDES2/citylunch
 - MVC Symfony
 - Sessions stockées dans Redis
 - Données persistées dans MySQL
-- Aucune API (render HTML uniquement)
+- UI web (Twig) + API REST JSON (`/api/*`)
 
 ---
 
@@ -60,4 +60,26 @@ Extensions PHP :
 git clone https://github.com/TON-USERNAME/citylunch.git
 cd citylunch
 composer install
+```
+
+---
+
+# 5. API REST (JSON)
+
+La documentation OpenAPI est disponible dans `docs/openapi.yaml`.
+
+Modèle conceptuel de données (MCD) : `docs/mcd.md`.
+
+## Endpoints principaux
+- Produits : `GET/POST /api/products`, `GET/PUT/DELETE /api/products/{id}`
+- Livreurs : `GET/POST /api/deliverers`, `GET/PUT/DELETE /api/deliverers/{id}`
+- Auth livreur (JWT) : `POST /api/login`
+- Sac du livreur (protégé JWT) : `GET /api/bag`, `POST /api/bag/items`, `DELETE /api/bag/items/{productId}`
+
+---
+
+# 6. Test unitaire
+
+```bash
+php bin/phpunit
 ```

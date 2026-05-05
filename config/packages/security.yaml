@@ -16,6 +16,12 @@ security:
             # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
+        api:
+            pattern: ^/(index\.php/)?api
+            stateless: true
+            provider: app_user_provider
+            custom_authenticator: App\Security\JwtAuthenticator
+            entry_point: App\Security\JwtAuthenticator
         main:
             lazy: true
             provider: app_user_provider
@@ -36,6 +42,10 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
+        - { path: ^/(index\.php/)?api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/(index\.php/)?api/products, roles: PUBLIC_ACCESS }
+        - { path: ^/(index\.php/)?api/deliverers, roles: PUBLIC_ACCESS }
+        - { path: ^/(index\.php/)?api/bag, roles: ROLE_COURIER }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
